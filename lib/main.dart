@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:calculator/KeyPad.dart';
+import 'package:calculator/keypad.dart';
+import 'package:calculator/display.dart';
 
 void main() {
   runApp(MyApp());
@@ -34,8 +35,24 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  String _output = '';
+
+  @override
+  void initState() {
+    KeyController.listen((event) => setState(() {_output += event.key.symbol;}));
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    KeyController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
+    Size screen = MediaQuery.of(context).size;
+
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
@@ -43,6 +60,7 @@ class _MyHomePageState extends State<MyHomePage> {
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
+          Display(value: _output, height: screen.height - screen.width * 1.5),
           KeyPad()
         ],
       )

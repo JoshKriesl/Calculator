@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'dart:async';
 
 class KeyPad extends StatelessWidget {
 
@@ -17,9 +18,9 @@ class KeyPad extends StatelessWidget {
         ),
         Row(
           children: <Widget>[
-            CalcKey('1'),
-            CalcKey('2'),
-            CalcKey('3'),
+            CalcKey('7'),
+            CalcKey('8'),
+            CalcKey('9'),
             CalcKey('x'),
           ],
         ),
@@ -33,9 +34,9 @@ class KeyPad extends StatelessWidget {
         ),
         Row(
           children: <Widget>[
-            CalcKey('7'),
-            CalcKey('8'),
-            CalcKey('9'),
+            CalcKey('1'),
+            CalcKey('2'),
+            CalcKey('3'),
             CalcKey('+'),
           ],
         ),
@@ -55,6 +56,8 @@ class CalcKey extends StatelessWidget {
   CalcKey(this.symbol);
 
   final String symbol;
+  static dynamic _fire(CalcKey key) => KeyController.fire(KeyEvent(key));
+
 
   @override
   Widget build(BuildContext context) {
@@ -69,9 +72,25 @@ class CalcKey extends StatelessWidget {
           color: Colors.cyan,
           child: Text(symbol, style: style),
           onPressed: () {
+            _fire(this);
             HapticFeedback.heavyImpact();
           },
         )
     );
   }
+}
+
+class KeyEvent {
+  KeyEvent(this.key);
+  final CalcKey key;
+}
+
+class KeyController {
+  static StreamController _controller = StreamController();
+  static Stream get _stream => _controller.stream;
+
+  static StreamSubscription listen(Function handler) => _stream.listen(handler as dynamic);
+  static void fire(KeyEvent event) => _controller.add(event);
+
+  static dispose() => _controller.close();
 }
