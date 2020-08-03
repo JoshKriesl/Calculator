@@ -1,3 +1,4 @@
+import 'package:calculator/solver.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:calculator/keypad.dart';
@@ -15,11 +16,11 @@ class MyApp extends StatelessWidget {
     SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
 
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Calco',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
+        fontFamily: 'Mulish'
       ),
       home: MyHomePage(title: 'Flutter Demo Home Page'),
     );
@@ -39,28 +40,27 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   void initState() {
-    KeyController.listen((event) => setState(() {_output += event.key.symbol;}));
+    KeyController.listen((event) => Solver.process(event));
+    Solver.listen((data) => setState(() { _output = data; }));
+    Solver.refresh();
     super.initState();
   }
 
   @override
   void dispose() {
     KeyController.dispose();
+    Solver.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    Size screen = MediaQuery.of(context).size;
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
-          Display(value: _output, height: screen.height - screen.width * 1.5),
+          Display(val: _output),
           KeyPad()
         ],
       )
