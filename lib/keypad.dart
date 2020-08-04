@@ -61,7 +61,7 @@ class KeySymbol {
   final KeyType type;
 }
 
-// Avalible Keys and their catagoery
+// Available Keys and their category's
 class Keys {
   // FUNCTIONS
   static KeySymbol clear = const KeySymbol('C', KeyType.FUNC);
