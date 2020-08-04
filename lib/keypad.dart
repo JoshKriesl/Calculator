@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'dart:async';
@@ -60,6 +61,7 @@ class KeySymbol {
   final KeyType type;
 }
 
+// Avalible Keys and their catagoery
 class Keys {
   // FUNCTIONS
   static KeySymbol clear = const KeySymbol('C', KeyType.FUNC);
@@ -85,31 +87,86 @@ class Keys {
   static KeySymbol nine = const KeySymbol('9', KeyType.INT);
 }
 
-class CalcKey extends StatelessWidget {
+class CalcKey extends StatefulWidget {
   CalcKey(this.symbol);
-
   final KeySymbol symbol;
-  static dynamic _fire(CalcKey key) => KeyController.fire(KeyEvent(key));
 
+  @override
+  _CalcKeyState createState() => _CalcKeyState();
+}
+
+class _CalcKeyState extends State<CalcKey> {
+  static dynamic _fire(CalcKey key) => KeyController.fire(KeyEvent(key));
+  bool show = false;
+
+  Gradient get gradient => LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [
+      _getAdjustColor(widget.symbol.type == KeyType.INT ? Color(0xFFFFF2DF) : Color(0xFF77978C), -12),
+      _getAdjustColor(widget.symbol.type == KeyType.INT ? Color(0xFFFFF2DF) : Color(0xFF77978C), 12),
+    ],
+  );
 
   @override
   Widget build(BuildContext context) {
     double size = MediaQuery.of(context).size.width / 4;
-    TextStyle style = Theme.of(context).textTheme.headline4.copyWith(color: symbol.type == KeyType.INT ? Color(0xFF77978C) : Color(0xFFFFF2DF));
+    TextStyle style = Theme.of(context).textTheme.headline4.copyWith(color: widget.symbol.type == KeyType.INT ? Color(0xFF77978C) : Color(0xFFFFF2DF));
 
-    return Container(
-        width: symbol.val == '0' ? size * 2 : size,
-        padding: EdgeInsets.all(1),
+    return GestureDetector(
+      onTapCancel: () {
+        setState(() {
+          show = false;
+        });
+        HapticFeedback.lightImpact();
+      },
+      onTapUp: (_) {
+        setState(() {
+          show = false;
+        });
+        HapticFeedback.lightImpact();
+      },
+      onTapDown: (_) {
+        setState(() {
+          show = true;
+        });
+        _fire(widget);
+        HapticFeedback.heavyImpact();
+      },
+      child: SizedBox(
+        width: widget.symbol.val == '0' ? size * 2 : size,
         height: size,
-        child: RaisedButton(
-          color: symbol.type == KeyType.INT ? Color(0xFFFFF2DF) : Color(0xFF77978C),
-          child: Text(symbol.val, style: style),
-          onPressed: () {
-            _fire(this);
-            HapticFeedback.heavyImpact();
-          },
-        )
+        child: ColoredBox(
+          color: widget.symbol.type == KeyType.INT ? Color(0xFFFFF2DF) : Color(0xFF77978C),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 80),
+            decoration: BoxDecoration(
+              gradient: show ? gradient : null
+            ),
+            child: Center(child: Text(widget.symbol.val, style: style)),
+          ),
+        ),
+      ),
     );
+  }
+
+  Color _getAdjustColor(Color baseColor, double amount) {
+    Map<String, int> colors = {
+      'r': baseColor.red,
+      'g': baseColor.green,
+      'b': baseColor.blue
+    };
+
+    colors = colors.map((key, value) {
+      if (value + amount < 0) {
+        return MapEntry(key, 0);
+      }
+      if (value + amount > 255) {
+        return MapEntry(key, 255);
+      }
+      return MapEntry(key, (value + amount).floor());
+    });
+    return Color.fromRGBO(colors['r'], colors['g'], colors['b'], 1);
   }
 }
 
