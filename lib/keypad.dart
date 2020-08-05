@@ -12,7 +12,7 @@ class KeyPad extends StatelessWidget {
         Row(
           children: <Widget>[
             CalcKey(Keys.clear),
-            CalcKey(Keys.sign),
+            CalcKey(Keys.delete),
             CalcKey(Keys.percent),
             CalcKey(Keys.divide),
           ],
@@ -45,6 +45,7 @@ class KeyPad extends StatelessWidget {
           children: <Widget>[
             CalcKey(Keys.zero),
             CalcKey(Keys.decimal),
+            CalcKey(Keys.sign),
             CalcKey(Keys.equals),
           ],
         )
@@ -65,7 +66,8 @@ class KeySymbol {
 class Keys {
   // FUNCTIONS
   static KeySymbol clear = const KeySymbol('C', KeyType.FUNC);
-  static KeySymbol sign = const KeySymbol('±', KeyType.FUNC);
+  static KeySymbol delete = const KeySymbol('⌫', KeyType.FUNC);
+  static KeySymbol sign = const KeySymbol('+/-', KeyType.FUNC);
   static KeySymbol percent = const KeySymbol('%', KeyType.FUNC);
   static KeySymbol decimal = const KeySymbol('.', KeyType.FUNC);
   // OPERATORS
@@ -134,7 +136,7 @@ class _CalcKeyState extends State<CalcKey> {
         HapticFeedback.heavyImpact();
       },
       child: SizedBox(
-        width: widget.symbol.val == '0' ? size * 2 : size,
+        width: size,
         height: size,
         child: ColoredBox(
           color: widget.symbol.type == KeyType.INT ? Color(0xFFFFF2DF) : Color(0xFF77978C),

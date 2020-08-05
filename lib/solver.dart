@@ -24,7 +24,6 @@ class Solver {
   static dispose() => _controller.close();
 
   static process(dynamic event) {
-
     CalcKey key = (event as KeyEvent).key;
     switch(key.symbol.type) {
 
@@ -40,12 +39,12 @@ class Solver {
   }
 
   static void handleFunction(CalcKey key) {
-
     if (_valA == '0') { return; }
     if (_result != null) { _condense(); }
 
     Map<KeySymbol, dynamic> table = {
       Keys.clear: () => _clear(),
+      Keys.delete: () => _delete(),
       Keys.sign: () => _sign(),
       Keys.percent: () => _percent(),
       Keys.decimal: () => _decimal(),
@@ -56,7 +55,6 @@ class Solver {
   }
 
   static void handleOperator(CalcKey key) {
-
     if (_valA == '0') { return; }
     if (key.symbol == Keys.equals) { return _calculate(); }
     if (_result != null) { _condense(); }
@@ -66,7 +64,6 @@ class Solver {
   }
 
   static void handleInteger(CalcKey key) {
-
     String val = key.symbol.val;
     if (_operator == null) { _valA = (_valA == '0') ? val : _valA + val; }
     else { _valB = (_valB == '0') ? val : _valB + val; }
@@ -74,13 +71,15 @@ class Solver {
   }
 
   static void _clear() {
-
     _valA = _valB = '0';
     _operator = _result = null;
   }
 
-  static void _sign() {
+  static void _delete() {
+    _operator == null ? _valA = '0' : _valB= '0';
+  }
 
+  static void _sign() {
     if (_valB != '0') { _valB = (_valB.contains('-') ? _valB.substring(1) : '-' + _valB); }
     else if (_valA != '0') { _valA = (_valA.contains('-') ? _valA.substring(1) : '-' + _valA); }
   }
@@ -94,13 +93,11 @@ class Solver {
   }
 
   static void _decimal() {
-
     if (_valB != '0' && !_valB.contains('.')) { _valB = _valB + '.'; }
     else if (_valA != '0' && !_valA.contains('.')) { _valA = _valA + '.'; }
   }
 
   static void _calculate() {
-
     if (_operator == null || _valB == '0') { return; }
 
     Map<KeySymbol, dynamic> table = {
@@ -122,7 +119,6 @@ class Solver {
   }
 
   static void _condense() {
-
     _valA = _result;
     _valB = '0';
     _result = _operator = null;
